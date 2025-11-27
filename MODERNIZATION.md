@@ -34,6 +34,7 @@ pre-commit install
 | File | Purpose |
 |------|----------|
 | `pyproject.toml` | Modern packaging configuration (replaces setup.py config) |
+| `tests/` | Test directory with basic import tests |
 | `.github/workflows/ci.yml` | Automated testing on every push |
 | `.github/workflows/publish.yml` | Automated PyPI releases |
 | `.github/dependabot.yml` | Automatic dependency updates |
@@ -53,6 +54,20 @@ pre-commit install
 ### Unchanged Files
 
 All code in `ultimapy/` directory remains unchanged. Zero API changes.
+
+## Linting Philosophy
+
+**Pragmatic approach:** This is a legacy codebase being modernized incrementally.
+
+- **CI**: Linting is **informational only** (non-blocking)
+- **Pre-commit**: Catches obvious issues, but relaxed rules
+- **Ruff**: Ignores legacy patterns (star imports, etc.)
+- **Mypy**: Relaxed type checking for untyped legacy code
+- **Black**: Auto-formats new code
+
+**Why?** The original codebase has 22 ruff warnings and 40 mypy errors. Fixing these is a separate refactoring effort. Modernization shouldn't be blocked by pre-existing code style.
+
+**Future:** As the codebase evolves, we can gradually tighten these rules.
 
 ## Dependency Changes
 
@@ -76,6 +91,13 @@ dependencies = [
 
 ## New Development Commands
 
+### Testing
+```bash
+pytest                     # Run tests
+pytest -v                  # Verbose
+pytest --cov=ultimapy      # With coverage
+```
+
 ### Code Formatting
 ```bash
 black .                    # Format all code
@@ -92,13 +114,12 @@ ruff check ultimapy/       # Lint specific directory
 
 ### Type Checking
 ```bash
-mypy ultimapy              # Check types
-mypy --strict ultimapy     # Strict mode
+mypy ultimapy              # Check types (relaxed for legacy code)
 ```
 
 ### All Quality Checks
 ```bash
-black . && ruff check . && mypy ultimapy
+black . && ruff check . && mypy ultimapy && pytest
 ```
 
 ### Pre-commit (Automatic)
@@ -126,11 +147,15 @@ Every push and PR automatically runs:
    - Python 3.12
    - Python 3.13
 
-3. **Quality Checks**
+3. **Quality Checks** (informational only)
    - Ruff linting
    - Black formatting
    - mypy type checking
    - Package build verification
+
+4. **Actual Tests** (blocking)
+   - Import tests
+   - Package structure tests
 
 ### Publishing to PyPI
 
@@ -161,7 +186,7 @@ Just review and merge. Keeps dependencies current.
 - [ ] Install dev dependencies (`pip install -e .[dev]`)
 - [ ] Set up pre-commit (`pre-commit install`)
 - [ ] Read CONTRIBUTING.md
-- [ ] Run quality checks before committing
+- [ ] Run `pytest` to verify setup
 
 ### If You're Maintaining a Fork
 - [ ] Review pyproject.toml for your fork's metadata
@@ -182,10 +207,10 @@ Just review and merge. Keeps dependencies current.
 ### New Stack (v0.0.25+)
 - pyproject.toml for packaging (PEP standard)
 - GitHub Actions CI/CD
+- pytest test framework
 - Black for formatting
 - Ruff for linting (replaces flake8, isort, pyupgrade)
-- mypy for type checking
-- pytest for testing
+- mypy for type checking (relaxed)
 - pre-commit for git hooks
 - Dependabot for updates
 
@@ -194,10 +219,10 @@ Just review and merge. Keeps dependencies current.
 | Tool | Replaces | Why Better |
 |------|----------|------------|
 | **pyproject.toml** | setup.py config | PEP standard, single source of truth |
+| **pytest** | Manual testing | Automated, repeatable, CI-ready |
 | **Black** | Manual formatting | Opinionated, consistent, no debates |
 | **Ruff** | flake8, isort, pyupgrade | 10-100x faster, one tool does it all |
-| **mypy** | None | Catches type errors before runtime |
-| **pytest** | Manual testing | Automated, repeatable, CI-ready |
+| **mypy** | None | Catches type errors (when ready) |
 | **pre-commit** | Manual checks | Automatic, prevents bad commits |
 | **GitHub Actions** | Manual testing | Multi-OS/Python testing on every push |
 | **Dependabot** | Manual updates | Automatic, never outdated |
@@ -216,6 +241,12 @@ Just review and merge. Keeps dependencies current.
 
 ### "Do I need to change my code?"
 No. API unchanged.
+
+### "Do I need to fix all the linting warnings?"
+No. They're informational. Fix them incrementally if you want.
+
+### "Will my PR fail CI if it has lint warnings?"
+No. Only actual test failures block PRs.
 
 ### "Do I need Python 3.13?"
 No. 3.9+ works. We test all versions.
@@ -253,4 +284,4 @@ Original project by [Jack Ward](https://github.com/jackuoll).
 
 ---
 
-**TL;DR**: Everything's better, nothing breaks, Python 3.9+ required.
+**TL;DR**: Everything's better, nothing breaks, Python 3.9+ required, linting is informational only.
