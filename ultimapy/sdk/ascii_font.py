@@ -7,21 +7,22 @@ from .utils import get_arbg_from_16_bit, read_byte
 
 class ASCIIFont:
     """
-        Results 100% accurate to C# Ultima SDK in the limited testing done.
-        Some methods not implemented.
-        Should be reconfigured to auto load. Should never need to instantiate anything manually.
+    Results 100% accurate to C# Ultima SDK in the limited testing done.
+    Some methods not implemented.
+    Should be reconfigured to auto load. Should never need to instantiate anything manually.
     """
+
     FONTS = []
 
     def __init__(self, buffer):
         self.header = ord(buffer.read(1))
         self.height = 0
-        self.characters = {} # letter, image
+        self.characters = {}  # letter, image
         ASCIIFont.FONTS.append(self)
 
     @classmethod
     def load(cls):
-        with open(ultima_file_path('fonts.mul'), 'rb') as f:
+        with open(ultima_file_path("fonts.mul"), "rb") as f:
             for i in range(10):
                 font = ASCIIFont(f)
                 for k in range(224):
@@ -61,7 +62,7 @@ class ASCIIFont:
     def get_string_image(self, full_string):
         width = self.get_width(full_string)
         height = self.height + 2
-        new_im = Image.new('RGBA', (width, height))
+        new_im = Image.new("RGBA", (width, height))
         x_offset = 2
         for im in self.character_image_list(full_string):
             new_im.paste(im, (x_offset, height - im.size[1]))

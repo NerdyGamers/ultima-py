@@ -5,6 +5,7 @@ from .utils import safe_list_get
 
 class BodyConverter:
     """No known issues."""
+
     loaded = False
     TABLE_1 = []
     TABLE_2 = []
@@ -14,7 +15,7 @@ class BodyConverter:
     @classmethod
     def load(cls):
         print("Loading BodyConverter")
-        f = open(ultima_file_path('Bodyconv.def'), 'r')
+        f = open(ultima_file_path("Bodyconv.def"), "r")
         max1 = max2 = max3 = max4 = 0
         list1 = []
         list2 = []
@@ -102,7 +103,7 @@ class BodyTable:
     @classmethod
     def load(cls):
         print("Loading BodyTable")
-        f = open(ultima_file_path('Body.def'), 'r')
+        f = open(ultima_file_path("Body.def"), "r")
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -112,10 +113,10 @@ class BodyTable:
             index1 = line.index("{")
             index2 = line.index("}")
             param1 = line[:index1].strip()
-            param2 = line[index1+1:index2]
-            param3 = line[index2+1:].strip()
+            param2 = line[index1 + 1 : index2]
+            param3 = line[index2 + 1 :].strip()
             if "," in param2:
-                param2 = param2[:param2.index(",")].strip()
+                param2 = param2[: param2.index(",")].strip()
             cls.entries[int(param1)] = BodyTableEntry(int(param2), int(param1), int(param3))
 
 

@@ -13,10 +13,14 @@ class Animation:
     table = {}
     _file_indexes = [
         FileIndex("anim.idx", "anim.mul", 0x40000, 6),
-        FileIndex("anim2.idx", "anim2.mul", 0x10000, -1),  # i don't have these files to test anything
-        FileIndex("anim3.idx", "anim3.mul", 0x20000, -1),  # i don't have these files to test anything
+        FileIndex(
+            "anim2.idx", "anim2.mul", 0x10000, -1
+        ),  # i don't have these files to test anything
+        FileIndex(
+            "anim3.idx", "anim3.mul", 0x20000, -1
+        ),  # i don't have these files to test anything
         FileIndex("anim4.idx", "anim4.mul", 0x20000, -1),
-        FileIndex("anim5.idx", "anim5.mul", 0x20000, -1)
+        FileIndex("anim5.idx", "anim5.mul", 0x20000, -1),
     ]
 
     @classmethod
@@ -29,11 +33,11 @@ class Animation:
         if not stream:
             return None
         flip = direction > 4
-        palette = [x ^ 0x8000 for x in unpack('H' * 256, stream.read(2 * 256))]
+        palette = [x ^ 0x8000 for x in unpack("H" * 256, stream.read(2 * 256))]
         start = stream.tell()
-        frame_count = unpack('i', stream.read(4))[0]
+        frame_count = unpack("i", stream.read(4))[0]
         frames = [None] * frame_count
-        lookups = [start + x for x in unpack('i' * frame_count, stream.read(4 * frame_count))]
+        lookups = [start + x for x in unpack("i" * frame_count, stream.read(4 * frame_count))]
         hue = (hue & 0x3FFF) - 1
         hue_obj = None
         if spectral_shade:
@@ -93,18 +97,18 @@ class Animation:
     @classmethod
     def get_anim_count(cls, file_type):
         if file_type == 2:
-            info = [200, cls._file_indexes[file_type-1].index_length - 22000 * 12, 12 * 65]
+            info = [200, cls._file_indexes[file_type - 1].index_length - 22000 * 12, 12 * 65]
         else:
             if file_type not in range(6):
                 file_type = 1
-            info = [400, cls._file_indexes[file_type-1].index_length - 35000 * 12, 12 * 175]
+            info = [400, cls._file_indexes[file_type - 1].index_length - 35000 * 12, 12 * 175]
         return info[0] + info[1] / info[2]
 
     @classmethod
     def get_anim_length(cls, body, file_type):
         if file_type not in [1, 2, 3, 4, 5]:
             file_type = 1
-        if file_type in [1,4,5]:
+        if file_type in [1, 4, 5]:
             return 22 if body < 200 else 13 if body < 400 else 35
         if file_type == 2:
             return 22 if body < 200 else 13
@@ -114,9 +118,9 @@ class Animation:
 
     @classmethod
     def get_file_index(cls, body, action, direction, file_type):
-        if file_type not in [1,2,3,4,5]:
+        if file_type not in [1, 2, 3, 4, 5]:
             file_type = 1
-        file_idx = cls._file_indexes[file_type-1]
+        file_idx = cls._file_indexes[file_type - 1]
         index = None
         if file_type == 1:
             if body < 200:
@@ -194,7 +198,9 @@ class Animation:
         paste_centered(img, player_frames)
         for item_id, hue in filter(lambda layer: not is_mount(layer[0]), layers):
             item = item_data(item_id)
-            clothing_frame = Animation.get_animation(item.animation, action, 1, hue, True, item.partial_hue)
+            clothing_frame = Animation.get_animation(
+                item.animation, action, 1, hue, True, item.partial_hue
+            )
             if not clothing_frame:
                 continue
             paste_centered(img, clothing_frame)
@@ -212,16 +218,16 @@ class Frame:
     def __init__(self, palette, reader, flip):
         if reader is None:
             self.center = None
-            self.bitmap = Image.new('RGBA', (0, 0))
+            self.bitmap = Image.new("RGBA", (0, 0))
             return
-        x_center, y_center, width, height = unpack('h' * 4, reader.read(2 * 4))
+        x_center, y_center, width, height = unpack("h" * 4, reader.read(2 * 4))
         if width == 0 or height == 0:
             return
 
-        self.bitmap = Image.new('RGBA', (width, height))
+        self.bitmap = Image.new("RGBA", (width, height))
         x_base = x_center - 0x200
         y_base = y_center + height - 0x200
-        header = unpack('i', reader.read(4))[0]
+        header = unpack("i", reader.read(4))[0]
         while header != 0x7FFF7FFF:
             header ^= self._double_xor
             bytes_to_write = header & 0xFFF
@@ -232,7 +238,7 @@ class Frame:
                 if c != 0:
                     self.bitmap.putpixel((x + i, y), get_arbg_from_16_bit(c))
 
-            header = unpack('i', reader.read(4))[0]
+            header = unpack("i", reader.read(4))[0]
         if flip:
             self.bitmap = self.bitmap.transpose(Image.FLIP_LEFT_RIGHT)
             x_center = width - x_center

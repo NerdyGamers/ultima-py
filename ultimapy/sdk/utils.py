@@ -15,7 +15,10 @@ def paste_centered(parent_image, input_frame, frame_no=0):
     if not input_frame or len(input_frame) <= frame_no:
         return
     input_frame = input_frame[frame_no]
-    new_center = (100 - input_frame.center[0], 100 - input_frame.center[1] - input_frame.bitmap.size[1])
+    new_center = (
+        100 - input_frame.center[0],
+        100 - input_frame.center[1] - input_frame.bitmap.size[1],
+    )
     parent_image.paste(input_frame.bitmap, new_center, input_frame.bitmap)
 
 
@@ -43,10 +46,12 @@ def safe_list_get(lst, idx, default):
 
 def get_arbg_from_16_bit(sixteen):
     """Should be refactored."""
+
     def get_arbg(num):
         num = num * 255 / 31
         num = round(num)
         return num
+
     blue = get_arbg(sixteen & 31)
     green = get_arbg((sixteen >> 5) & 31)
     red = get_arbg((sixteen >> 10) & 31)
@@ -55,20 +60,19 @@ def get_arbg_from_16_bit(sixteen):
 
 
 def read_int16(buf):
-    return unpack('h', buf.read(2))[0]
+    return unpack("h", buf.read(2))[0]
 
 
 def read_int32(buf) -> int:
-    return unpack('i', buf.read(4))[0]
+    return unpack("i", buf.read(4))[0]
 
 
 def read_int64(buf) -> int:
-    return unpack('q', buf.read(8))[0]
+    return unpack("q", buf.read(8))[0]
 
 
 def read_uint64(buf) -> int:
-    return unpack('Q', buf.read(8))[0]
-
+    return unpack("Q", buf.read(8))[0]
 
 
 def is_mount(item_id):
@@ -89,24 +93,54 @@ def hash_file_name(s: str):
     i = 0
 
     while i + 12 < len(s):
-        edi = ((ord(s[i + 7]) << 24) | (ord(s[i + 6]) << 16) | (ord(s[i + 5]) << 8) | ord(s[i + 4])) + edi
+        edi = (
+            (ord(s[i + 7]) << 24) | (ord(s[i + 6]) << 16) | (ord(s[i + 5]) << 8) | ord(s[i + 4])
+        ) + edi
         edi = ctypes.c_uint(edi).value
-        esi = ((ord(s[i + 11]) << 24) | (ord(s[i + 10]) << 16) | (ord(s[i + 9]) << 8) | ord(s[i + 8])) + esi
+        esi = (
+            (ord(s[i + 11]) << 24) | (ord(s[i + 10]) << 16) | (ord(s[i + 9]) << 8) | ord(s[i + 8])
+        ) + esi
         esi = ctypes.c_uint(esi).value
-        edx = ((ord(s[i + 3]) << 24) | (ord(s[i + 2]) << 16) | (ord(s[i + 1]) << 8) | ord(s[i])) - esi
+        edx = (
+            (ord(s[i + 3]) << 24) | (ord(s[i + 2]) << 16) | (ord(s[i + 1]) << 8) | ord(s[i])
+        ) - esi
         edx = ctypes.c_uint(edx).value
 
-        edx = ctypes.c_uint(edx + ebx).value ^ ctypes.c_uint(esi >> 28).value ^ ctypes.c_uint(esi << 4).value
+        edx = (
+            ctypes.c_uint(edx + ebx).value
+            ^ ctypes.c_uint(esi >> 28).value
+            ^ ctypes.c_uint(esi << 4).value
+        )
         esi = ctypes.c_uint(edi + esi).value
-        edi = ctypes.c_uint(edi - edx).value ^ ctypes.c_uint(edx >> 26).value ^ ctypes.c_uint(edx << 6).value
+        edi = (
+            ctypes.c_uint(edi - edx).value
+            ^ ctypes.c_uint(edx >> 26).value
+            ^ ctypes.c_uint(edx << 6).value
+        )
         edx = ctypes.c_uint(esi + edx).value
-        esi = ctypes.c_uint(esi - edi).value ^ ctypes.c_uint(edi >> 24).value ^ ctypes.c_uint(edi << 8).value
+        esi = (
+            ctypes.c_uint(esi - edi).value
+            ^ ctypes.c_uint(edi >> 24).value
+            ^ ctypes.c_uint(edi << 8).value
+        )
         edi = ctypes.c_uint(edx + edi).value
-        ebx = ctypes.c_uint(edx - esi).value ^ ctypes.c_uint(esi >> 16).value ^ ctypes.c_uint(esi << 16).value
+        ebx = (
+            ctypes.c_uint(edx - esi).value
+            ^ ctypes.c_uint(esi >> 16).value
+            ^ ctypes.c_uint(esi << 16).value
+        )
         esi = ctypes.c_uint(esi + edi).value
-        edi = ctypes.c_uint(edi - ebx).value ^ ctypes.c_uint(ebx >> 13).value ^ ctypes.c_uint(ebx << 19).value
+        edi = (
+            ctypes.c_uint(edi - ebx).value
+            ^ ctypes.c_uint(ebx >> 13).value
+            ^ ctypes.c_uint(ebx << 19).value
+        )
         ebx = ctypes.c_uint(ebx + esi).value
-        esi = ctypes.c_uint(esi - edi).value ^ ctypes.c_uint(edi >> 28).value ^ ctypes.c_uint(edi << 4).value
+        esi = (
+            ctypes.c_uint(esi - edi).value
+            ^ ctypes.c_uint(edi >> 28).value
+            ^ ctypes.c_uint(edi << 4).value
+        )
         edi = ctypes.c_uint(edi + ebx).value
         i += 12
 

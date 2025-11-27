@@ -90,6 +90,9 @@ ignore = [
     "E501",  # line too long (handled by black)
     "F403",  # star imports (legacy codebase)
     "F405",  # may be undefined from star imports (legacy codebase)
+    "E722",  # bare except (legacy codebase)
+    "B007",  # unused loop control variable (legacy tables)
+    "B019",  # lru_cache on methods (legacy patterns)
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -105,17 +108,20 @@ addopts = "-v"
 
 [tool.mypy]
 python_version = "3.9"
-warn_return_any = false
-warn_unused_configs = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-check_untyped_defs = false
-no_implicit_optional = false
-warn_redundant_casts = false
-warn_unused_ignores = false
-warn_no_return = false
-follow_imports = "normal"
 ignore_missing_imports = true
-# Relax for legacy codebase
-allow_untyped_calls = true
+follow_imports = "skip"
+
+# Relax for legacy Ultima Online SDK style code
+allow_untyped_globals = true
 allow_untyped_defs = true
+allow_incomplete_defs = true
+allow_untyped_calls = true
+
+disable_error_code = [
+    "var-annotated",
+    "attr-defined",
+    "no-any-return",
+    "operator",
+    "assignment",
+    "call-overload",
+]

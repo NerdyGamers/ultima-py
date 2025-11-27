@@ -8,10 +8,11 @@ from .utils import get_arbg_from_16_bit
 
 class Hues:
     """
-        Results 100% accurate to C# Ultima SDK in the limited testing done.
-        Not all methods implemented.
-        Should be reconfigured to auto load. Should never need to instantiate anything manually.
+    Results 100% accurate to C# Ultima SDK in the limited testing done.
+    Not all methods implemented.
+    Should be reconfigured to auto load. Should never need to instantiate anything manually.
     """
+
     HUES: Dict[int, "Hue"] = {}
 
     @classmethod
@@ -40,18 +41,18 @@ class Hues:
     def load(cls):
         print("Loading Hues")
         cls.HUES = {i: Hue(i) for i in range(3000)}
-        f = open(ultima_file_path('hues.mul'), 'rb')
-        block_count = max(375, int(unpack('i', f.read(4))[0] / 708))
+        f = open(ultima_file_path("hues.mul"), "rb")
+        block_count = max(375, int(unpack("i", f.read(4))[0] / 708))
         f.seek(0)
         headers = []  # why?
         idx = 0
         for i in range(block_count):
-            headers.append(unpack('i', f.read(4)))
+            headers.append(unpack("i", f.read(4)))
             for j in range(8):
                 new_hue = Hue(idx)
-                new_hue.colors = [x | 0x8000 for x in unpack('H'*32, f.read(64))]
-                new_hue.table_start, new_hue.table_end = unpack('hh', f.read(4))
-                new_hue.name = f.read(20).decode('cp1252')
+                new_hue.colors = [x | 0x8000 for x in unpack("H" * 32, f.read(64))]
+                new_hue.table_start, new_hue.table_end = unpack("hh", f.read(4))
+                new_hue.name = f.read(20).decode("cp1252")
                 cls.HUES[idx] = new_hue
                 idx += 1
         # ethereal hue
@@ -60,9 +61,10 @@ class Hues:
 
 class Hue:
     """
-        Results 100% accurate to C# Ultima SDK in the limited testing done.
-        Not all methods implemented.
+    Results 100% accurate to C# Ultima SDK in the limited testing done.
+    Not all methods implemented.
     """
+
     def __init__(self, index):
         self.name = None
         self.index = index
@@ -87,6 +89,7 @@ class Hue:
                         img.putpixel((x, y), get_arbg_from_16_bit(self.colors[r]))
 
         return img
+
 
 if not Hues.HUES:
     Hues.load()

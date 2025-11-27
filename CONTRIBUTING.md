@@ -159,20 +159,20 @@ from PIL import Image
 
 
 def render_item(
-    item_id: int, 
+    item_id: int,
     hue: Optional[int] = None,
     check_max_id: bool = True
 ) -> Image.Image:
     """Render an Ultima Online item.
-    
+
     Args:
         item_id: The item ID to render
         hue: Optional hue index to apply
         check_max_id: Whether to validate item ID range
-        
+
     Returns:
         PIL Image object containing the rendered item
-        
+
     Raises:
         ValueError: If item_id is invalid
     """

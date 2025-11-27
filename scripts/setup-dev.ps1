@@ -13,7 +13,7 @@ Write-Host "[1/6] Checking Python version..."
 try {
     $pythonVersion = (python --version 2>&1) -replace 'Python ', ''
     Write-Host "Found Python $pythonVersion"
-    
+
     $version = [version]$pythonVersion
     if ($version.Major -lt 3 -or ($version.Major -eq 3 -and $version.Minor -lt 9)) {
         Write-Host "ERROR: Python 3.9+ required. You have $pythonVersion" -ForegroundColor Red

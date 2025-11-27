@@ -16,7 +16,7 @@ class Art:
         uop_file="artLegacyMUL.uop",
         uop_entry_extension=".tga",
         uop_has_extra=False,
-        uop_idx_length=0x13FDC
+        uop_idx_length=0x13FDC,
     )
     idx_length = 0
     _max_item_id = 0
@@ -39,7 +39,9 @@ class Art:
     def load(cls):
         cls.idx_length = cls._file_index.index_length / 12
         cls.is_uoahs = cls.idx_length >= 0x13FDC
-        cls._max_item_id = 0xFFF if cls.idx_length >= 0x13FDC else 0x7FFF if cls.idx_length == 0xC000 else 0x3FFF
+        cls._max_item_id = (
+            0xFFF if cls.idx_length >= 0x13FDC else 0x7FFF if cls.idx_length == 0xC000 else 0x3FFF
+        )
 
     @classmethod
     def get_legal_item_id(cls, item_id, check_max_id=True):
@@ -94,7 +96,7 @@ class Art:
         if not stream:
             return False
         stream.seek(4)
-        dat = unpack('H' * 4, stream.read(2) * 4)
+        dat = unpack("H" * 4, stream.read(2) * 4)
         # todo: really need to check the output. c# appears to check a byte past the end of the array.
         # todo: also it seems to read 1 byte shorts?
         for short in dat:
@@ -127,7 +129,9 @@ class Art:
             return None
         if patched:
             cls._patched[index] = True
-        caching_data = True  # todo: c# this is Files.CacheData, but it's a static bool that's always true
+        caching_data = (
+            True  # todo: c# this is Files.CacheData, but it's a static bool that's always true
+        )
         if caching_data:
             cls._cache[index] = cls.load_land(stream)
             return cls._cache[index]
@@ -163,7 +167,9 @@ class Art:
             return None
         if patched:
             cls._patched[index] = True
-        caching_data = True  # todo: c# this is Files.CacheData, but it's a static bool that's always true
+        caching_data = (
+            True  # todo: c# this is Files.CacheData, but it's a static bool that's always true
+        )
         if caching_data:
             cls._cache[index] = cls.load_static(stream)
             return cls._cache[index]
@@ -187,7 +193,7 @@ class Art:
     @classmethod
     def load_static(cls, stream):
         def read_number():
-            return unpack('h', stream.read(2))[0]
+            return unpack("h", stream.read(2))[0]
 
         orig_pos = stream.tell()
         stream.seek(4, 1)
@@ -223,7 +229,7 @@ class Art:
         def read_number(byte_length):
             if byte_length == 1:
                 return ord(stream.read(1))
-            return unpack('h', stream.read(2))[0]
+            return unpack("h", stream.read(2))[0]
 
         bitmap = Image.new("RGBA", (44, 44))
 
@@ -239,7 +245,9 @@ class Art:
         x_run = 44
         for y in range(22):
             for x in range(x_run):
-                bitmap.putpixel((x + x_offset, y + 22), get_arbg_from_16_bit(read_number(2) | 0x8000))
+                bitmap.putpixel(
+                    (x + x_offset, y + 22), get_arbg_from_16_bit(read_number(2) | 0x8000)
+                )
             x_offset += 1
             x_run -= 2
 
