@@ -1,13 +1,12 @@
 import ctypes
-import os
 from io import BytesIO
 from pathlib import Path
 from struct import unpack
 from typing import Optional
 
 from ultimapy.settings import ultima_file_path
-from . import utils
 
+from . import utils
 from .verdata import Verdata
 
 
@@ -21,7 +20,7 @@ class FileIndex:
         uop_file: Optional[str] = None,
         uop_entry_extension: Optional[str] = None,
         uop_has_extra: Optional[bool] = None,
-        uop_idx_length: Optional[int] = None
+        uop_idx_length: Optional[int] = None,
     ):
         """would really benefit from refactoring to not have the worst instantiation method of all time"""
         self.index = []
@@ -79,7 +78,9 @@ class FileIndex:
                         continue
 
                     if idx < 0 or idx > len(self.index):
-                        raise ValueError("hashes dictionary and files collection have different count of entries!")
+                        raise ValueError(
+                            "hashes dictionary and files collection have different count of entries!"
+                        )
 
                     self.index[idx].lookup = offset + header_length
                     self.index[idx].length = entry_length
@@ -90,8 +91,12 @@ class FileIndex:
                     cur_pos = self.file_stream.tell()
                     self.file_stream.seek(offset + header_length)
                     extra = self.file_stream.read(8)
-                    extra1 = ctypes.c_ushort((extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]).value
-                    extra2 = ctypes.c_ushort((extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]).value
+                    extra1 = ctypes.c_ushort(
+                        (extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]
+                    ).value
+                    extra2 = ctypes.c_ushort(
+                        (extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]
+                    ).value
                     self.index[idx].lookup += 8  # ???
                     self.index[idx].extra = extra1 << 16 | ctypes.c_int32(extra2).value
                     self.file_stream.seek(cur_pos)
@@ -99,7 +104,7 @@ class FileIndex:
             try:
                 index_file = None
                 self.index_file_path = ultima_file_path(idx_filename)
-                index_file = open(self.index_file_path, 'rb')
+                index_file = open(self.index_file_path, "rb")
                 self.mul_file_path = ultima_file_path(mul_filename)
             except FileNotFoundError:
                 print(f"No file for index {idx_filename if not index_file else mul_filename}")
@@ -110,7 +115,7 @@ class FileIndex:
             length = length or count
             self.index_length = idx_file_bytes
             for i in range(count):
-                self.index.append(Entry3D(*unpack('i'*3, index_file.read(4*3))))
+                self.index.append(Entry3D(*unpack("i" * 3, index_file.read(4 * 3))))
             for i in range(count, length):
                 self.index.append(Entry3D(-1, -1, -1))
             patches = Verdata.patches
@@ -141,7 +146,7 @@ class FileIndex:
             return BytesIO(stream.read(length)), length, extra, patched
 
         if not is_validation:
-            with open(self.mul_file_path, 'rb') as stream:
+            with open(self.mul_file_path, "rb") as stream:
                 stream.seek(entry.lookup)
                 byte_stream = BytesIO(stream.read(length))
             return byte_stream, length, extra, patched

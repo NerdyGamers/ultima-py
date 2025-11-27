@@ -18,7 +18,7 @@ class Gumps:
         uop_file="gumpartLegacyMUL.uop",
         uop_idx_length=-1,
         uop_entry_extension=".tga",
-        uop_has_extra=True
+        uop_has_extra=True,
     )
     _cache = [None] * 0xFFFF
     _removed = [False] * 0xFFFF
@@ -27,7 +27,7 @@ class Gumps:
     @classmethod
     def get_gump(cls, index: int, hue=0, partial_hue=False):
         def read_number():
-            return unpack('h', stream.read(2))[0]
+            return unpack("h", stream.read(2))[0]
 
         cached = cls._cache[index]
         if cached:
@@ -44,7 +44,7 @@ class Gumps:
         orig_pos = stream.tell()
         lookups = [0] * height
         for i in range(height):
-            lookups[i] = unpack('i', stream.read(4))[0] * 4
+            lookups[i] = unpack("i", stream.read(4))[0] * 4
 
         bitmap = Image.new("RGBA", (width, height))
         for y in range(height):
@@ -70,15 +70,15 @@ class Gumps:
 
     def paperdoll_of(self, female, body_hue, layers, order=True):
         """
-            Draw a paperdoll of the passed layers.
-            :param female: Avatar is female?
-            :param body_hue: Body hue of the player.
-            :param layers: List of tuples in the format (ItemID, Hue).
-            :param order: Whether to try order them to look correct. If set to false, the list of tuples must be in the
-                          order in which you want them rendered. This would be useful if the default ordering does not contain
-                          the items in your list.
-            :return: A trimmed image of all the layers.
-            """
+        Draw a paperdoll of the passed layers.
+        :param female: Avatar is female?
+        :param body_hue: Body hue of the player.
+        :param layers: List of tuples in the format (ItemID, Hue).
+        :param order: Whether to try order them to look correct. If set to false, the list of tuples must be in the
+                      order in which you want them rendered. This would be useful if the default ordering does not contain
+                      the items in your list.
+        :return: A trimmed image of all the layers.
+        """
         img = Image.new("RGBA", (260, 237))
         body = 12 + int(female)
         body_img = get_gump(body, body_hue, True)
@@ -88,7 +88,9 @@ class Gumps:
             item = item_data(item_id)
             anim = item.animation
             partial = item.partial_hue
-            item = get_gump(anim + 50000 + int(female) * 10000, hue, partial) or get_gump(anim + 50000, hue, partial)
+            item = get_gump(anim + 50000 + int(female) * 10000, hue, partial) or get_gump(
+                anim + 50000, hue, partial
+            )
             if not item:
                 continue
             img.paste(item, (0, 0), item)
