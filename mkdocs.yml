@@ -1,0 +1,26 @@
+site_name: UltimaPy
+site_description: Python SDK for Ultima Online client files
+site_url: https://nerdygamers.github.io/ultima-py/
+repo_url: https://github.com/NerdyGamers/ultima-py
+repo_name: NerdyGamers/ultima-py
+
+nav:
+  - Home: docs/index.md
+  - Installation: docs/installation.md
+  - Quickstart: docs/quickstart.md
+  - Configuration: docs/configuration.md
+  - SDK:
+      - Overview: docs/api/index.md
+      - Settings: docs/api/settings.md
+      - Art: docs/api/art.md
+      - Hues: docs/api/hues.md
+      - Tile Data: docs/api/tiledata.md
+      - Bodies: docs/api/bodies.md
+      - ASCII Font: docs/api/ascii_font.md
+      - Skills: docs/api/skills.md
+  - Formats: docs/formats/index.md
+  - Contributing: CONTRIBUTING.md
+  - Changelog: CHANGELOG.md
+
+theme:
+  name: mkdocs
