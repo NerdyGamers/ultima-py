@@ -37,6 +37,12 @@ class Art:
 
     @classmethod
     def load(cls):
+        if not hasattr(cls._file_index, "index_length"):
+            # Minimal defaults for a "no data" environment (CI/tests)
+            cls.idx_length = 0
+            cls.is_uoahs = False
+            cls._max_item_id = 0
+            return
         cls.idx_length = cls._file_index.index_length / 12
         cls.is_uoahs = cls.idx_length >= 0x13FDC
         cls._max_item_id = (

@@ -22,7 +22,15 @@ class ASCIIFont:
 
     @classmethod
     def load(cls):
-        with open(ultima_file_path("fonts.mul"), "rb") as f:
+        path = ultima_file_path("fonts.mul")
+        try:
+            f = open(path, "rb")
+        except FileNotFoundError:
+            # In CI / test environments there's no fonts.mul; skip loading so
+            # module imports succeed without requiring client data.
+            return
+
+        with f:
             for i in range(10):
                 font = ASCIIFont(f)
                 for k in range(224):
@@ -42,7 +50,10 @@ class ASCIIFont:
                             second_byte = read_byte(f)
                             pixel_num = first_byte | (second_byte << 8)
                             if pixel_num > 0:
-                                img.putpixel((x, y), get_arbg_from_16_bit(pixel_num ^ 0x8000))
+                                img.putpixel(
+                                    (x, y),
+                                    get_arbg_from_16_bit(pixel_num ^ 0x8000),
+                                )
                     font.add_character(chr(k + 32), img)
 
     def add_character(self, letter, character):

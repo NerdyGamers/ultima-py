@@ -17,12 +17,25 @@ class TileData:
 
     @classmethod
     def load(cls):
+        # Try to open tiledata.mul; in CI / test environments this file will not exist.
+        path = ultima_file_path("tiledata.mul")
+        try:
+            f = open(path, "rb")
+        except FileNotFoundError:
+            # No tiledata available – leave existing tables as-is and
+            # allow imports to succeed without client data.
+            cls.loaded = False
+            return
+
         cls.loaded = True
-        with open(ultima_file_path("tiledata.mul"), "rb") as f:
+        with f:
             f.seek(0, 2)
             length = f.tell()
             f.seek(0)
-            cls.new_format = Art.is_uoahs  # ??? todo: huge assumption here that art has loaded.
+
+            # ??? huge assumption here that art has loaded; preserved from original
+            cls.new_format = Art.is_uoahs
+
             j = 0
             for i in range(0, len(cls.land_data), 32):
                 cls.land_header[j] = unpack("i", f.read(4))[0]
@@ -37,6 +50,7 @@ class TileData:
             item_length = len(cls.item_header) * 32
             cls.item_data = [None] * item_length
             cls.height_table = [0] * item_length
+
             j = 0
             for i in range(0, item_length, 32):
                 cls.item_header[j] = unpack("i", f.read(4))[0]

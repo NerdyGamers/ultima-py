@@ -28,12 +28,35 @@ def ultima_file_path(file_name):
 
 
 ULTIMA_MOUNT_IDS = get_django_var_or_env("MOUNT_IDS")
+
+# If coming from env/Django as a JSON string, parse it
 if isinstance(ULTIMA_MOUNT_IDS, str):
     import json
 
     ULTIMA_MOUNT_IDS = json.loads(ULTIMA_MOUNT_IDS)
 
+# Default mounts if nothing configured
 if not ULTIMA_MOUNT_IDS:
-    ULTIMA_MOUNT_IDS = [228, 200, 218, 204, 179, 226, 219, 116, 178, 220, 210, 117]
+    ULTIMA_MOUNT_IDS = [
+        228,
+        200,
+        218,
+        204,
+        179,
+        226,
+        219,
+        116,
+        178,
+        220,
+        210,
+        117,
+    ]
 
-ULTIMA_FILES_DIR = os.path.abspath(get_django_var_or_env("ULTIMA_FILES_DIR"))
+# Base directory for Ultima Online client files.
+# In test/CI environments, there is no configured client path, so fall back
+# to the current working directory to allow imports to succeed.
+_raw_dir = get_django_var_or_env("ULTIMA_FILES_DIR")
+if not _raw_dir:
+    _raw_dir = os.getcwd()
+
+ULTIMA_FILES_DIR = os.path.abspath(_raw_dir)
